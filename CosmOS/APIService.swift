@@ -5,7 +5,7 @@ class APIService {
     static func fetchPhoto(date: String = "today", completion: @escaping (Result<APODItem, Error>) -> Void) {
         
         // Construct url
-        let apiKey = "XuDrvoiyaKDrlK25TeaH0V49qz1jYbSUvE16rU7M"
+        let apiKey = "demo_key"
         // If getting a specific date, we append &date=YYYY-MM-DD, otherwise it defaults to today
         let urlString = "https://api.nasa.gov/planetary/apod?api_key=\(apiKey)"
         
