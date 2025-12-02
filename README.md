@@ -9,7 +9,6 @@ The app features a "Time Machine" capability, allowing users to explore space hi
 | Mission Control (Home) | Archives (Detail View) |
 |:----------------------:|:----------------------:|
 | ![Home Screen](<img width="576" height="1027" alt="Screenshot 2025-12-02 at 3 56 41 PM" src="https://github.com/user-attachments/assets/04616a08-8233-4629-a785-9492f593f51e" />) | ![Detail Screen](<img width="565" height="1026" alt="Screenshot 2025-12-02 at 3 56 57 PM" src="https://github.com/user-attachments/assets/151b0930-7e0e-425b-a2a8-dda04382c92d" />) |
-*(Note: Replace these links with your actual screenshot files)*
 
 ### 🛠️ API & Tools Used
 * **API:** [NASA Astronomy Picture of the Day (APOD)](https://api.nasa.gov/) - Used to fetch daily high-resolution space imagery, titles, and descriptions.
