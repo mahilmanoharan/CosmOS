@@ -6,143 +6,184 @@ struct ContentView: View {
     @State private var userNote: String = ""
     @State private var selectedHemisphere: String = "Northern"
     @State private var selectedDate: Date = Date()
+    @State private var isDescriptionExpanded: Bool = false
     
     let hemispheres = ["Northern", "Southern"]
     
     var body: some View {
         NavigationView {
             ZStack {
-                // COSMIC BACKGROUND
-                LinearGradient(gradient: Gradient(colors: [Color.black, Color(red: 0.1, green: 0.1, blue: 0.2)]), startPoint: .top, endPoint: .bottom)
+                // Background: Deep Space Gradient
+                LinearGradient(gradient: Gradient(colors: [Color.black, Color(red: 0.05, green: 0.05, blue: 0.1)]), startPoint: .top, endPoint: .bottom)
                     .edgesIgnoringSafeArea(.all)
                 
                 ScrollView {
-                    VStack(spacing: 20) {
+                    VStack(alignment: .leading, spacing: 25) {
                         
-                        // CONTROLS
-                        VStack(spacing: 15) {
-                            Text("Mission Control")
-                                .font(.headline)
+                        // Top Section. Shows like what you can see in the sky from what hemisphere of earth you are on.
+                        VStack(alignment: .leading, spacing: 10) {
+                            
+                            Text("Where are you observing from?")
+                                .font(.title2)
+                                .bold()
                                 .foregroundColor(.white)
                             
-                            // DATE PICKER
-                            DatePicker("Travel to Date", selection: $selectedDate, in: ...Date(), displayedComponents: .date)
-                                .datePickerStyle(.compact)
-                                .accentColor(.purple)
-                                .onChange(of: selectedDate) { newDate in
-                                    // When date changes, fetch new data!
-                                    viewModel.loadData(for: newDate)
-                                }
-
+                            Text("Your location on Earth determines which stars are visible in your night sky.")
+                                .font(.footnote)
+                                .foregroundColor(.gray)
+                            
                             Picker("Hemisphere", selection: $selectedHemisphere) {
                                 ForEach(hemispheres, id: \.self) { hemisphere in
                                     Text(hemisphere)
                                 }
                             }
                             .pickerStyle(SegmentedPickerStyle())
+                            .padding(.top, 5)
                             
-                            Text(selectedHemisphere == "Northern" ? "🔭 Visible: Ursa Major & Cassiopeia" : "🔭 Visible: Southern Cross & Centaurus")
-                                .font(.caption)
-                                .foregroundColor(.cyan)
+                            // Dynamic advice based on location. Work in progress...
+                            HStack {
+                                Image(systemName: "binoculars.fill")
+                                    .foregroundColor(.cyan)
+                                Text(selectedHemisphere == "Northern" ? "Look North: Ursa Major is visible tonight." : "Look South: The Southern Cross is visible tonight.")
+                                    .font(.caption)
+                                    .foregroundColor(.cyan)
+                            }
                         }
                         .padding()
                         .background(.ultraThinMaterial)
                         .cornerRadius(15)
                         .padding(.horizontal)
                         
-                        // THE PHOTO
-                        if let photo = viewModel.currentPhoto {
-                            VStack(alignment: .leading) {
-                                Text(photo.title)
-                                    .font(.title2)
-                                    .bold()
-                                    .foregroundColor(.white)
-                                    .padding(.bottom, 5)
+                        // The main part. Shows the picture and the description pulled from nasa api.
+                        VStack(alignment: .leading, spacing: 10) {
 
-                                AsyncImage(url: URL(string: photo.url)) { image in
-                                    image
-                                        .resizable()
-                                        .scaledToFit()
-                                } placeholder: {
-                                    ZStack {
-                                        Color.black
-                                        ProgressView()
+                            // DATE PICKER
+                            HStack {
+                                Spacer()
+                                DatePicker("", selection: $selectedDate, in: ...Date(), displayedComponents: .date)
+                                    .labelsHidden()
+                                    .accentColor(.cyan)
+                                    .onChange(of: selectedDate) { newDate in
+                                        viewModel.loadData(for: newDate)
                                     }
-                                    .frame(height: 250)
-                                }
-                                .cornerRadius(12)
-                                .shadow(color: .purple.opacity(0.5), radius: 10, x: 0, y: 5) // Glowing shadow
-                                
-                                Text(photo.explanation)
-                                    .font(.body)
-                                    .foregroundColor(.gray)
-                                    .padding(.top)
-                                
-                                // INPUT NOTE
-                                TextField("Captain's Log (Notes)...", text: $userNote)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    .padding(.vertical)
-                                    .colorScheme(.light) // Keep text field readable
-                                
-                                Button(action: {
-                                    viewModel.addToFavorites()
-                                }) {
-                                    HStack {
-                                        Image(systemName: "star.fill")
-                                        Text("Save to Database")
-                                    }
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(LinearGradient(colors: [.purple, .blue], startPoint: .leading, endPoint: .trailing))
-                                    .foregroundColor(.white)
-                                    .cornerRadius(10)
-                                }
                             }
-                            .padding()
-                            .background(.ultraThinMaterial)
-                            .cornerRadius(15)
                             .padding(.horizontal)
-                            
-                        } else if let error = viewModel.errorMessage {
-                            Text("Signal Lost: \(error)")
-                                .foregroundColor(.red)
+
+                            if let photo = viewModel.currentPhoto {
+                                VStack(alignment: .leading) {
+                                    // Image
+                                    AsyncImage(url: URL(string: photo.url)) { image in
+                                        image.resizable().scaledToFit()
+                                    } placeholder: {
+                                        ZStack {
+                                            Color.black.frame(height: 250)
+                                            ProgressView()
+                                        }
+                                    }
+                                    .cornerRadius(10)
+                                    .shadow(radius: 10)
+                                    
+                                    Text(photo.title)
+                                        .font(.title3)
+                                        .bold()
+                                        .foregroundColor(.white)
+                                        .padding(.top, 10)
+                                    
+                                    // DESCRIPTION TEXT
+                                    VStack(alignment: .leading) {
+                                        Text(photo.explanation)
+                                        .font(.body)
+                                        .foregroundColor(.gray)
+                                        // Shows full description if clicked on.
+                                        .lineLimit(isDescriptionExpanded ? nil : 3)
+                                        .animation(.easeInOut, value: isDescriptionExpanded) // Smooth slide
+                                    }
+                                            .onTapGesture {
+                                            // Cool animation that shows up when expanded or made smaller.
+                                            withAnimation {
+                                                isDescriptionExpanded.toggle()
+                                                }
+                                            }
+                                    
+                                    Divider().background(Color.gray)
+                                    
+                                    // Add your thoughts on the phenomena!
+                                    TextField("Write a log entry...", text: $userNote)
+                                        .padding()
+                                        .background(Color.white.opacity(0.1))
+                                        .cornerRadius(8)
+                                        .foregroundColor(.white)
+                                    
+                                    // Favorite button
+                                    Button(action: {
+                                        viewModel.addToFavorites(note: userNote) // Pass the note!
+                                        userNote = "" // Clear the box
+                                    }) {
+                                        HStack {
+                                            Image(systemName: "plus")
+                                            Text("Add to Favorites")
+                                        }
+                                        .frame(maxWidth: .infinity)
+                                        .padding()
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .stroke(Color.gray, lineWidth: 1) // Classy border
+                                        )
+                                        .foregroundColor(.white)
+                                    }
+                                    .padding(.top, 5)
+                                }
                                 .padding()
                                 .background(.ultraThinMaterial)
-                                .cornerRadius(10)
-                        } else {
-                            ProgressView("Establishing Link...")
-                                .foregroundColor(.white)
-                                .onAppear {
-                                    viewModel.loadData() // Load today initially
-                                }
+                                .cornerRadius(15)
+                                .padding(.horizontal)
+                            } else {
+                                ProgressView()
+                                    .onAppear { viewModel.loadData() }
+                                    .frame(maxWidth: .infinity, minHeight: 200)
+                            }
                         }
                         
-                        // FAVORITES
+                        // Archive or Favorites
                         if !viewModel.favorites.isEmpty {
                             VStack(alignment: .leading) {
-                                Text("Database Archives")
+                                Text("Your Archives")
                                     .font(.title3)
                                     .bold()
                                     .foregroundColor(.white)
                                     .padding(.leading)
                                 
                                 ForEach(viewModel.favorites) { photo in
-                                    PhotoCardView(photo: photo)
+                                    // NAVIGATION LINK: Makes items clickable
+                                    NavigationLink(destination: DetailView(photo: photo)) {
+                                        PhotoCardView(photo: photo)
                                         .padding(.horizontal)
+                                    }
+                                    // Long Press to Delete
+                                    .contextMenu {
+                                        Button(role: .destructive) {
+                                                withAnimation {
+                                                viewModel.removeFavorite(photo: photo)
+                                                }
+                                            } label: {
+                                        Label("Remove", systemImage: "trash")
+                                        }
+                                    }
                                 }
                             }
+                            .padding(.bottom, 50)
                         }
                     }
-                    .padding(.bottom, 40)
                 }
             }
             .navigationTitle("CosmOS")
-            .navigationBarTitleDisplayMode(.inline)
-            .preferredColorScheme(.dark) // Forces Dark Mode
+            .navigationBarHidden(true) // Hide default ugly nav bar
         }
+        .preferredColorScheme(.dark)
     }
 }
 
+// The mini cards that represent your favorited item under the archives section.
 struct PhotoCardView: View {
     let photo: APODItem
     
@@ -150,7 +191,7 @@ struct PhotoCardView: View {
         HStack {
             AsyncImage(url: URL(string: photo.url)) { image in
                 image.resizable()
-                    .scaledToFill() // Fills the square perfectly
+                    .scaledToFill()
             } placeholder: {
                 Color.gray
             }
@@ -161,16 +202,16 @@ struct PhotoCardView: View {
             VStack(alignment: .leading) {
                 Text(photo.title)
                     .font(.headline)
-                    .foregroundColor(.white) // White text
+                    .foregroundColor(.white)
                     .lineLimit(1)
                 Text(photo.date)
                     .font(.caption)
-                    .foregroundColor(.cyan) // Sci-fi blue text
+                    .foregroundColor(.cyan)
             }
             Spacer()
         }
         .padding()
-        .background(Color.white.opacity(0.1)) // Subtle transparent background
+        .background(Color.white.opacity(0.1))
         .cornerRadius(10)
     }
 }
