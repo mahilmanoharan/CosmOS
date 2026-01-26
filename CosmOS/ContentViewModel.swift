@@ -8,6 +8,7 @@ class ContentViewModel: ObservableObject {
     
     // Data storage for ForEach
     @Published var favorites: [APODItem] = []
+    @Published var marsPhoto: [MarsPhoto] = []
     
     // Function to handle date changes
         func loadData(for date: Date = Date()) {
@@ -15,6 +16,8 @@ class ContentViewModel: ObservableObject {
             formatter.dateFormat = "yyyy-MM-dd"
             let dateString = formatter.string(from: date)
             
+            
+            // for APOD photo
             Task {
                 do {
                     // We "await" the result
@@ -22,6 +25,17 @@ class ContentViewModel: ObservableObject {
                     self.currentPhoto = photo
                 } catch {
                     self.errorMessage = error.localizedDescription
+                }
+            }
+            
+            // for mars photo
+            Task {
+                do {
+                    self.marsPhoto = []
+                    let photo = try await APIService.fetchMarsPhoto(date: <#T##String?#>)
+                    self.marsPhoto = photo
+                } catch{
+                    print("Mars photo error: \(error.localizedDescription)")
                 }
             }
         }
