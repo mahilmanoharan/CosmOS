@@ -54,7 +54,7 @@ struct ContentView: View {
                         .cornerRadius(15)
                         .padding(.horizontal)
                         
-                        // The main part. Shows the picture and the description pulled from nasa api.
+                        // APOD Picture. yayyyyy.
                         VStack(alignment: .leading, spacing: 10) {
 
                             // DATE PICKER
@@ -143,6 +143,11 @@ struct ContentView: View {
                                     .frame(maxWidth: .infinity, minHeight: 200)
                             }
                         }
+                        
+                        //Marrrs gallerrryyy!!
+                        
+                        MarsGalleryView(photos: viewModel.marsPhoto)
+                            .padding(.bottom,20)
                         
                         // Archive or Favorites
                         if !viewModel.favorites.isEmpty {
