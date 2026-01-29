@@ -32,7 +32,7 @@ class ContentViewModel: ObservableObject {
             Task {
                 do {
                     self.marsPhoto = []
-                    let photo = try await APIService.fetchMarsPhoto(date: <#T##String?#>)
+                    let photo = try await APIService.fetchMarsPhoto(date: dateString)
                     self.marsPhoto = photo
                 } catch{
                     print("Mars photo error: \(error.localizedDescription)")

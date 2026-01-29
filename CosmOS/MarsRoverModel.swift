@@ -2,6 +2,25 @@ import Foundation
 
 struct MarsRoverModel: Codable {
     let photos: [MarsPhoto]
+    
+    enum CodingKeys: String, CodingKey{
+        case photos
+        case latestPhotos = "latest_photos"
+    }
+    
+    init (from decoder: Decoder) throws{
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        if let regularList = try? container.decode([MarsPhoto].self, forKey: .photos){
+            photos = regularList
+        }
+        else if let latestList = try? container.decode([MarsPhoto].self, forKey: .latestPhotos){
+            photos = latestList
+        }
+        else{
+            photos = []
+        }
+    }
 }
 
 //photo data structure
