@@ -159,12 +159,12 @@ struct ContentView: View {
                                     .padding(.leading)
                                 
                                 ForEach(viewModel.favorites) { photo in
-                                    // NAVIGATION LINK: Makes items clickable
+                                    // lets you click on items
                                     NavigationLink(destination: DetailView(photo: photo)) {
                                         PhotoCardView(photo: photo)
                                         .padding(.horizontal)
                                     }
-                                    // Long Press to Delete
+                                    // cool long press to delete
                                     .contextMenu {
                                         Button(role: .destructive) {
                                                 withAnimation {
