@@ -15,7 +15,7 @@ class ContentViewModel: ObservableObject {
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd"
             let dateString = formatter.string(from: date)
-            
+            let todayString = formatter.string(from: Date())
             
             // for APOD photo
             Task {
@@ -32,8 +32,11 @@ class ContentViewModel: ObservableObject {
             Task {
                 do {
                     self.marsPhoto = []
-                    let photo = try await APIService.fetchMarsPhoto(date: dateString)
-                    self.marsPhoto = photo
+                    
+                    if dateString==todayString {
+                        let photos = try await APIService.fetchMarsPhoto()
+                        self.marsPhoto=photos
+                    }
                 } catch{
                     print("Mars photo error: \(error.localizedDescription)")
                 }

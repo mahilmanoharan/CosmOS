@@ -5,9 +5,9 @@ struct MarsGalleryView: View {
     
     var body: some View{
         VStack(alignment: .leading) {
-            Label("Mars Rover: Curiosity", systemImage: "rover")
+            Label("Mars Gallery", systemImage: "rover")
                 .font(.headline)
-                .foregroundColor(Color(.orange))
+                .foregroundColor(Color(.white))
                 .padding(.horizontal)
             
             if photos.isEmpty {
@@ -19,7 +19,7 @@ struct MarsGalleryView: View {
                 ScrollView(.horizontal, showsIndicators: false){
                     HStack(spacing: 15){
                         ForEach(photos) { photo in
-                            AsyncImage(url: URL(string: photo.imgSrc)) {image in
+                            AsyncImage(url: photo.secureURL) {image in
                                 image.resizable().scaledToFill()
                             } placeholder: {
                                 Color.black.opacity(0.3)

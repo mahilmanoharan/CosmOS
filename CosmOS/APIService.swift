@@ -5,7 +5,7 @@ class APIService {
     // use the nasa api!!!!!
     static func fetchPhoto(date: String?) async throws -> APODItem {
         
-        var urlString = "https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY"
+        var urlString = "https://api.nasa.gov/planetary/apod?api_key=DEMO_Key"
         
         if let validDate = date {
             urlString += "&date=\(validDate)"
@@ -22,9 +22,9 @@ class APIService {
     }
     
     // get mars photos
-    static func fetchMarsPhoto(date: String?) async throws -> [MarsPhoto] {
+    static func fetchMarsPhoto() async throws -> [MarsPhoto] {
         
-        let urlString = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?earth_date=\(date)&api_key=DEMO_KEY"
+        let urlString = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/latest_photos?api_key=DEMO_Key"
         
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
