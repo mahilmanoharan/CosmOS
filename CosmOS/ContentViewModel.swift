@@ -52,7 +52,7 @@ class ContentViewModel: ObservableObject {
             }
         }
     
-    // Function to remove a specific item
+    // removes item
         func removeFavorite(photo: APODItem) {
             if let index = favorites.firstIndex(where: { $0.id == photo.id }) {
                 favorites.remove(at: index)
